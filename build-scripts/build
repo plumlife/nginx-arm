@@ -1,0 +1,6 @@
+#!/bin/bash
+
+withouts=$(cat ../configure_withouts.txt)
+
+cd nginx-1.9.0
+echo ${withouts} | xargs ./configure --with-http_ssl_module --without-http_rewrite_module --prefix=/opt/arm --with-cc-opt="-I/opt/arm/include" --with-ld-opt="-L/opt/arm/lib"

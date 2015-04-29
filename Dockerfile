@@ -22,12 +22,21 @@ RUN curl http://nginx.org/download/nginx-1.9.0.tar.gz | tar zx
 
 RUN /nginx-build/build-utils
 
-RUN cd nginx-1.9.0 && echo $(cat ../configure_withouts.txt) | xargs ./configure --with-http_ssl_module --without-http_rewrite_module --prefix=/opt/arm
+RUN ls -al /usr/local/ssl/include/openssl
 
-RUN make
-RUN cat objs/Makefile | tail -n +3 > objs/Makefile.tmp
-RUN echo "CROSS_COMPILE=arm-linux-gnueabi-" > objs/Makefile
-RUN echo "CC =	\$(CROSS_COMPILE)gcc" >> objs/Makefile
-RUN cat objs/Makefile.tmp >> objs/Makefile
-RUN rm objs/Makefile.tmp
-RUN make
+RUN cd nginx-1.9.0 && \
+    echo $(cat /nginx-build/configure_withouts.txt) | \
+    xargs ./configure \
+    --with-cc-opt="-I/usr/local/ssl/include" \
+    --with-ld-opt="-L/usr/local/ssl/lib -ldl /usr/local/ssl/lib/libssl.a /usr/local/ssl/lib/libcrypto.a" \
+    --with-http_ssl_module \
+    --without-http_gzip_module \
+    --without-http_rewrite_module \
+    --prefix=/opt/arm
+
+RUN cd nginx-1.9.0 && cat objs/Makefile | tail -n +3 > objs/Makefile.tmp
+RUN cd nginx-1.9.0 && echo "CROSS_COMPILE=arm-linux-gnueabi-" > objs/Makefile
+RUN cd nginx-1.9.0 && echo "CC =	\$(CROSS_COMPILE)gcc" >> objs/Makefile
+RUN cd nginx-1.9.0 && cat objs/Makefile.tmp >> objs/Makefile
+RUN cd nginx-1.9.0 && rm objs/Makefile.tmp
+RUN cd nginx-1.9.0 && make
