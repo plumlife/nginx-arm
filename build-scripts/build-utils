@@ -1,0 +1,12 @@
+#!/bin/bash
+export CROSS=arm-linux-gnueabi
+export CC=${CROSS}-gcc
+export LD=${CROSS}-ld
+export AS=${CROSS}-as
+export AR=${CROSS}-ar
+
+echo "Configuring and making libopenssl"
+cd ../
+cd /opt/arm/openssl-1.0.1j
+./Configure -DOPENSSL_NO_HEARTBEATS --openssldir=/opt/arm no-shared os/compiler:arm-linux-gnueabi-gcc
+make install
